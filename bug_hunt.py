@@ -104,6 +104,7 @@ data = pickle.loads(request.data)"""
 
     if score == 5:
         print("Congratulations! You have completed the easy difficulty level.")
+        print("FLAG{E4sy_L3v3l_C0mpl3t3}")
     else:
         print("You have failed the easy difficulty level. Please try again.")
 
@@ -161,6 +162,7 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
         else:
             subprocess.run(shlex.split("cls"))
         print("Congratulations! You have completed the medium difficulty level.")
+        print("FLAG{M3d1um_L3v3l_S3cur3}")
     else:
         if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
             subprocess.run(shlex.split("clear"))
@@ -233,6 +235,7 @@ def hard_difficulty():
             subprocess.run(shlex.split("cls"))
 
         print("Congratulations! You have completed the hard difficulty level.")
+        print("FLAG{H4rd_L3v3l_S0lv3d}")
 
     else:
         # check which os is being used
