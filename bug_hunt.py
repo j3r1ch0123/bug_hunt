@@ -57,6 +57,7 @@ code. The harder the level, the more you earn.
         ready()
 
 def easy_difficulty():
+    global crypto
     questions = {
         "sql_injection": """user_input = input("Enter your username: ")
 query = f"SELECT * FROM users WHERE username = '{user_input}';""",
@@ -117,6 +118,7 @@ data = pickle.loads(request.data)"""
     ready()
 
 def medium_difficulty():
+    global crypto
     questions = {
         "csrf": """<form action="/transfer" method="POST">
     <input type="hidden" name="amount" value="1000">
@@ -181,6 +183,7 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
     ready()
 
 def hard_difficulty():
+    global crypto
     questions = {
         "buffer overflow": """void vulnerable_function(char *user_input) {
     char buffer[10];
