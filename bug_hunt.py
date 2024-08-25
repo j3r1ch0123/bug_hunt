@@ -6,8 +6,8 @@ import shlex
 def ready():
     introduction = """\
 This is a text-based game for bug bounty hunters. There are three levels:
-easy, medium, and hard. The goal of this game is to go through 5 different
-snippets of vulnerable code and identify each vulnerability.
+easy, medium, and hard. The goal of this game is to go through 5 snippets
+of vulnerable code and identify each vulnerability.
 """
     print(introduction)
     level = "Pick a level:\n 1. Easy\n 2. Medium\n 3. Hard\n-> "
