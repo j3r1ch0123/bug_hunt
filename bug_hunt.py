@@ -4,13 +4,17 @@ import subprocess
 import shlex
 import time
 
+crypto = 0
+
 def ready():
     introduction = """\
-In this game, you play a computer hacker who's bug bounty hunting for a company.
-The goal here is to accurately identify each vulnerability. You will be scored on a scale
-of 1-5, with 5 being the highest possible score. Best of luck. (Type "exit" to quit)
+In this game, you're a computer hacker participating in a digital heist.
+In order to get the crypto, you need to identify vulnerabilities in the
+code. The harder the level, the more you earn.
+(Type "exit" to quit)
 """
     print(introduction)
+    print(f"Current crypto: {crypto} BTC")
     level = "Pick a level:\n 1. Easy\n 2. Medium\n 3. Hard\n-> "
     difficulty = input(level)
 
@@ -105,6 +109,8 @@ data = pickle.loads(request.data)"""
     if score == 5:
         print("Congratulations! You have completed the easy difficulty level.")
         print("FLAG{E4sy_L3v3l_C0mpl3t3}")
+        crypto += 100
+        print(f"You now have {crypto} BTC")
     else:
         print("You have failed the easy difficulty level. Please try again.")
 
@@ -163,6 +169,8 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
             subprocess.run(shlex.split("cls"))
         print("Congratulations! You have completed the medium difficulty level.")
         print("FLAG{M3d1um_L3v3l_S3cur3}")
+        crypto += 1000
+        print(f"You now have {crypto} BTC")
     else:
         if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
             subprocess.run(shlex.split("clear"))
@@ -236,6 +244,8 @@ def hard_difficulty():
 
         print("Congratulations! You have completed the hard difficulty level.")
         print("FLAG{H4rd_L3v3l_S0lv3d}")
+        crypto += 10000
+        print(f"You now have {crypto} BTC")
 
     else:
         # check which os is being used
