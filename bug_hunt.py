@@ -10,7 +10,7 @@ easy, medium, and hard. The goal of this game is to go through 5 different
 snippets of vulnerable code and identify each vulnerability.
 """
     print(introduction)
-    level = "Pick a level:\n 1. Easy\n 2. Medium\n 3. Hard\n"
+    level = "Pick a level:\n 1. Easy\n 2. Medium\n 3. Hard\n-> "
     difficulty = input(level)
     if difficulty == "1":
         easy_difficulty()
