@@ -12,13 +12,33 @@ snippets of vulnerable code and identify each vulnerability.
     print(introduction)
     level = "Pick a level:\n 1. Easy\n 2. Medium\n 3. Hard\n-> "
     difficulty = input(level)
+
     if difficulty == "1":
+        if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
+            subprocess.run(shlex.split("clear"))
+        else:
+            subprocess.run(shlex.split("cls"))
         easy_difficulty()
+
     elif difficulty == "2":
+        if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
+            subprocess.run(shlex.split("clear"))
+        else:
+            subprocess.run(shlex.split("cls"))
         medium_difficulty()
+
     elif difficulty == "3":
+        if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
+            subprocess.run(shlex.split("clear"))
+        else:
+            subprocess.run(shlex.split("cls"))
         hard_difficulty()
+
     else:
+        if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
+            subprocess.run(shlex.split("clear"))
+        else:
+            subprocess.run(shlex.split("cls"))
         print("Invalid input. Please try again.")
         ready()
 
