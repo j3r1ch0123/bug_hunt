@@ -6,9 +6,9 @@ import time
 
 def ready():
     introduction = """\
-This is a text-based game for bug bounty hunters. There are three levels:
-easy, medium, and hard. The goal of this game is to go through 5 snippets
-of vulnerable code and identify each vulnerability.
+In this game, you play a computer hacker who's bug bounty hunting for a company.
+The goal here is to accurately identify each vulnerability. You will be scored on a scale
+of 1-5, with 5 being the highest possible score. Best of luck. (Type "exit" to quit)
 """
     print(introduction)
     level = "Pick a level:\n 1. Easy\n 2. Medium\n 3. Hard\n-> "
@@ -66,6 +66,8 @@ data = pickle.loads(request.data)"""
     }
 
     options = ["SQL Injection", "XSS", "File Inclusion", "Command Injection", "Insecure Deserialization"]
+    # Just in case the user is using uppercase letters
+    questions = {k.lower(): v for k, v in questions.items()}
     # Create a mapping from vulnerability type to its option number
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -87,6 +89,9 @@ data = pickle.loads(request.data)"""
             else:
                 subprocess.run(shlex.split("cls"))
             print("Correct!")
+
+            # Remove that question from the list
+            questions.pop(correct_key)
             score += 1
         else:
             # check which os is being used
@@ -118,6 +123,10 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
     }
 
     options = ["csrf", "file upload", "hardcoded credentials", "xxe", "weak cryptography"]
+
+    # Just in case the user is using uppercase letters
+    questions = {k.lower(): v for k, v in questions.items()}
+    # Create a mapping from vulnerability type to its option number
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
     print("Medium difficulty selected...")
@@ -135,6 +144,8 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
             else:
                 subprocess.run(shlex.split("cls"))
             print("Correct!")
+            # Remove that question from the list
+            questions.pop(correct_key)
             score += 1
         else:
             if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
@@ -181,6 +192,8 @@ def hard_difficulty():
     }
 
     options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection"]
+    # Just in case the user is using uppercase letters
+    questions = {k.lower(): v for k, v in questions.items()}
     # Create a mapping from vulnerability type to its option number
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -199,6 +212,8 @@ def hard_difficulty():
             else:
                 subprocess.run(shlex.split("cls"))
             print("Correct!")
+            # Remove that question from the list
+            questions.pop(correct_key)
             score += 1
         else:
             # check which os is being used
