@@ -167,7 +167,7 @@ def hard_difficulty():
     return 0;
 }""",
         "clickjacking": """<iframe src="http://vulnerable-site.com" style="opacity:0;"></iframe>""",
-        "ldap injection": """ldap_query = f"(&(uid={user_input})(objectClass=person))"""
+        "ldap injection": """query = f"(&(uid={user_input})(objectClass=person))"""
     }
 
     options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection"]
