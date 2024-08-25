@@ -2,6 +2,7 @@
 import random
 import subprocess
 import shlex
+import time
 
 def ready():
     introduction = """\
@@ -33,6 +34,15 @@ of vulnerable code and identify each vulnerability.
         else:
             subprocess.run(shlex.split("cls"))
         hard_difficulty()
+
+    elif difficulty == "exit":
+        if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
+            subprocess.run(shlex.split("clear"))
+        else:
+            subprocess.run(shlex.split("cls"))
+        print("Exiting game in 5 seconds, thanks for playing...")
+        time.sleep(5)
+        exit()
 
     else:
         if subprocess.check_output(shlex.split("uname -s")) == b'Linux\n':
