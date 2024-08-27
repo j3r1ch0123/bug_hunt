@@ -5,6 +5,8 @@ import shlex
 import time
 import platform
 
+crypto = 0
+
 def clear_screen():
     """Clear the screen based on the operating system."""
     os_name = platform.system()
@@ -17,13 +19,15 @@ def clear_screen():
 
 def ready():
     introduction = """\
-In this game, you play a computer hacker who's bug bounty hunting for a company.
-The goal here is to accurately identify each vulnerability. You will be scored on a scale
-of 1-5, with 5 being the highest possible score. Best of luck. (Type "exit" to quit)
+In this game, you're a computer hacker participating in a digital heist.
+In order to get the crypto, you need to identify vulnerabilities in the
+code. The harder the level, the more you earn.
+(Type "exit" to quit)
 """
     print(introduction)
+    print(f"Current crypto: {crypto} BTC")
     level = "Pick a level:\n 1. Easy\n 2. Medium\n 3. Hard\n-> "
-    difficulty = input(level).strip()
+    difficulty = input(level)
 
     if difficulty == "1":
         clear_screen()
@@ -45,6 +49,8 @@ of 1-5, with 5 being the highest possible score. Best of luck. (Type "exit" to q
         ready()
 
 def easy_difficulty():
+    global crypto
+
     questions = {
         "sql_injection": """user_input = input("Enter your username: ")
 query = f"SELECT * FROM users WHERE username = '{user_input}';""",
@@ -54,10 +60,22 @@ include($file);""",
         "command_injection": """$url = $_GET['url'];
 system($url);""",
         "insecure_deserialization": """import pickle
-data = pickle.loads(request.data)"""
+data = pickle.loads(request.data)""",
+        "open_redirect": """from flask import Flask, request, redirect
+
+app = Flask(__name__)
+
+@app.route('/login')
+def login():
+    next_url = request.args.get('next')
+    # Login logic here...
+    return redirect(next_url)
+
+# Assume login logic goes here
+""",
     }
 
-    options = ["SQL Injection", "XSS", "File Inclusion", "Command Injection", "Insecure Deserialization"]
+    options = ["SQL Injection", "XSS", "File Inclusion", "Command Injection", "Insecure Deserialization", "Open Redirect"]
     questions = {k.lower(): v for k, v in questions.items()}
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -68,8 +86,8 @@ data = pickle.loads(request.data)"""
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization")
-        answer = input("Your answer (1-5): ").strip()
+        print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization, 6. Open Redirect")
+        answer = input("Your answer (1-6): ").strip()
         
         if answer == correct_answer:
             clear_screen()
@@ -83,12 +101,15 @@ data = pickle.loads(request.data)"""
 
     if score == 5:
         print("Congratulations! You have completed the easy difficulty level.")
+        crypto += 10
+
     else:
         print("You have failed the easy difficulty level. Please try again.")
 
     ready()
 
 def medium_difficulty():
+    global crypto
     questions = {
         "csrf": """<form action="/transfer" method="POST">
     <input type="hidden" name="amount" value="1000">
@@ -98,10 +119,26 @@ def medium_difficulty():
         "hardcoded credentials": '''$username = "admin"; $password = "admin";''',
         "xxe": """<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><tag>&xxe;</tag>""",
         "weak cryptography": """from Crypto.Cipher import DES
-cipher = DES.new('8bytekey', DES.MODE_ECB)"""
+cipher = DES.new('8bytekey', DES.MODE_ECB)""",
+        "ssrf": """import requests
+from flask import Flask, request, send_file
+from io import BytesIO
+
+app = Flask(__name__)
+
+@app.route('/thumbnail')
+def thumbnail():
+    image_url = request.args.get('url')
+    image_response = requests.get(image_url)
+    
+    # Assume some image processing happens here
+    img_io = BytesIO(image_response.content)
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/jpeg')
+"""
     }
 
-    options = ["csrf", "file upload", "hardcoded credentials", "xxe", "weak cryptography"]
+    options = ["csrf", "file upload", "hardcoded credentials", "xxe", "weak cryptography", "ssrf"]
     questions = {k.lower(): v for k, v in questions.items()}
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -112,8 +149,8 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. csrf, 2. file upload, 3. hardcoded credentials, 4. xxe, 5. weak cryptography")
-        answer = input("Your answer (1-5): ").strip()
+        print("Options: 1. csrf, 2. file upload, 3. hardcoded credentials, 4. xxe, 5. weak cryptography, 6. ssrf")
+        answer = input("Your answer (1-6): ").strip()
 
         if answer == correct_answer:
             clear_screen()
@@ -128,6 +165,8 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
     if score == 5:
         clear_screen()
         print("Congratulations! You have completed the medium difficulty level.")
+        crypto += 20
+
     else:
         clear_screen()
         print("You have failed the medium difficulty level. Please try again.")
@@ -135,6 +174,7 @@ cipher = DES.new('8bytekey', DES.MODE_ECB)"""
     ready()
 
 def hard_difficulty():
+    global crypto
     questions = {
         "buffer overflow": """void vulnerable_function(char *user_input) {
     char buffer[10];
@@ -152,10 +192,29 @@ def hard_difficulty():
     return 0;
 }""",
         "clickjacking": """<iframe src="http://vulnerable-site.com" style="opacity:0;"></iframe>""",
-        "ldap injection": """query = f"(&(uid={user_input})(objectClass=person))"""
+        "ldap injection": """query = f"(&(uid={user_input})(objectClass=person))""",
+        "padding_oracle_attack": """from flask import Flask, request
+from Crypto.Cipher import AES
+import base64
+
+app = Flask(__name__)
+
+key = b'Sixteen byte key'
+cipher = AES.new(key, AES.MODE_CBC, iv=b'RandomIV12345678')
+
+@app.route('/decrypt')
+def decrypt():
+    encrypted_data = base64.b64decode(request.args.get('data'))
+    try:
+        plaintext = cipher.decrypt(encrypted_data)
+        # Check for padding and handle errors here
+        return f'Decrypted data: {plaintext}'
+    except ValueError:
+        return 'Decryption failed due to padding error', 400
+"""
     }
 
-    options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection"]
+    options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection", "padding oracle attack"]
     questions = {k.lower(): v for k, v in questions.items()}
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -165,8 +224,8 @@ def hard_difficulty():
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection")
-        answer = input("Your answer (1-5): ").strip()
+        print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection, 6. padding oracle attack")
+        answer = input("Your answer (1-6): ").strip()
 
         if answer == correct_answer:
             clear_screen()
@@ -182,6 +241,8 @@ def hard_difficulty():
     if score == 5:
         clear_screen()
         print("Congratulations! You have completed the hard difficulty level.")
+        crypto += 40
+
     else:
         clear_screen()
         print("You have failed the hard difficulty level. Please try again.")
