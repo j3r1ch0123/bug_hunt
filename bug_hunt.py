@@ -23,6 +23,7 @@ In this game, you're a computer hacker participating in a digital heist.
 In order to get the crypto, you need to identify vulnerabilities in the
 code. The harder the level, the more you earn.
 (Type "exit" to quit)
+(DISCLAIMER: This is not a crypto game)
 """
     print(introduction)
     print(f"Current crypto: {crypto} BTC")
