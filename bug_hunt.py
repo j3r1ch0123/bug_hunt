@@ -110,6 +110,7 @@ def login():
 
 def medium_difficulty():
     global crypto
+    
     questions = {
         "csrf": """<form action="/transfer" method="POST">
     <input type="hidden" name="amount" value="1000">
@@ -175,6 +176,7 @@ def thumbnail():
 
 def hard_difficulty():
     global crypto
+    
     questions = {
         "buffer overflow": """void vulnerable_function(char *user_input) {
     char buffer[10];
