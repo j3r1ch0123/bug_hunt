@@ -18,6 +18,16 @@ def clear_screen():
         print("\n" * 100)  # A simple workaround for unsupported OS
 
 def ready():
+    banner = """\
+__________                 ___ ___               __   
+\______   \__ __  ____    /   |   \ __ __  _____/  |_ 
+ |    |  _/  |  \/ ___\  /    ~    \  |  \/    \   __\\
+ |    |   \  |  / /_/  > \    Y    /  |  /   |  \  |  
+ |______  /____/\___  /   \___|_  /|____/|___|  /__|  
+        \/     /_____/          \/            \/      
+
+"""
+    print(banner)
     introduction = """\
 In this game, you're a computer hacker participating in a digital heist.
 In order to get the crypto, you need to identify vulnerabilities in the
@@ -111,7 +121,6 @@ def login():
 
 def medium_difficulty():
     global crypto
-    
     questions = {
         "csrf": """<form action="/transfer" method="POST">
     <input type="hidden" name="amount" value="1000">
@@ -177,7 +186,6 @@ def thumbnail():
 
 def hard_difficulty():
     global crypto
-    
     questions = {
         "buffer overflow": """void vulnerable_function(char *user_input) {
     char buffer[10];
