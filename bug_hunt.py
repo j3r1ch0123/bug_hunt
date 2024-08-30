@@ -242,7 +242,7 @@ int main() {
     int *ptr = malloc(sizeof(int));
     *ptr = 5;
     free(ptr);
-    printf("%d\n", *ptr); // Use after free
+    printf("%d\n", *ptr);
     return 0;
 }
 """
