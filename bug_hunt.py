@@ -259,7 +259,7 @@ int main() {
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
         print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection, 6. padding oracle attack, 7. use after free")
-        answer = input("Your answer (1-6): ").strip()
+        answer = input("Your answer (1-7): ").strip()
 
         if answer == correct_answer:
             clear_screen()
