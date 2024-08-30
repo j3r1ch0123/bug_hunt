@@ -101,7 +101,7 @@ response = requests.get(f"https://api.example.com/data?key={api_key}")""",
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
         print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization, 6. Open Redirect, 7. Hardcoded API Key")
-        answer = input("Your answer (1-6): ").strip()
+        answer = input("Your answer (1-7): ").strip()
         
         if answer == correct_answer:
             clear_screen()
