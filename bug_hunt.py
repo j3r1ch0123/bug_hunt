@@ -84,6 +84,9 @@ def login():
 
 # Assume login logic goes here
 """,
+        "hardcoded_api_key": """api_key = "12345-ABCDE-67890"
+response = requests.get(f"https://api.example.com/data?key={api_key}")""",
+        
     }
 
     options = ["SQL Injection", "XSS", "File Inclusion", "Command Injection", "Insecure Deserialization", "Open Redirect"]
@@ -97,7 +100,7 @@ def login():
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization, 6. Open Redirect")
+        print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization, 6. Open Redirect, 7. Hardcoded API Key")
         answer = input("Your answer (1-6): ").strip()
         
         if answer == correct_answer:
@@ -146,6 +149,15 @@ def thumbnail():
     img_io = BytesIO(image_response.content)
     img_io.seek(0)
     return send_file(img_io, mimetype='image/jpeg')
+""",
+        "path_transversal": """from flask import Flask, send_from_directory, request
+
+app = Flask(__name__)
+
+@app.route('/download')
+def download():
+    filename = request.args.get('file')
+    return send_from_directory('/secure_directory', filename)
 """
     }
 
@@ -160,8 +172,8 @@ def thumbnail():
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. csrf, 2. file upload, 3. hardcoded credentials, 4. xxe, 5. weak cryptography, 6. ssrf")
-        answer = input("Your answer (1-6): ").strip()
+        print("Options: 1. csrf, 2. file upload, 3. hardcoded credentials, 4. xxe, 5. weak cryptography, 6. ssrf, 7. path transversal")
+        answer = input("Your answer (1-7): ").strip()
 
         if answer == correct_answer:
             clear_screen()
@@ -222,10 +234,21 @@ def decrypt():
         return f'Decrypted data: {plaintext}'
     except ValueError:
         return 'Decryption failed due to padding error', 400
+""",
+        "use_after_free": """#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int *ptr = malloc(sizeof(int));
+    *ptr = 5;
+    free(ptr);
+    printf("%d\n", *ptr); // Use after free
+    return 0;
+}
 """
     }
 
-    options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection", "padding oracle attack"]
+    options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection", "padding oracle attack", "user after free"]
     questions = {k.lower(): v for k, v in questions.items()}
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -235,7 +258,7 @@ def decrypt():
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection, 6. padding oracle attack")
+        print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection, 6. padding oracle attack, 7. use after free")
         answer = input("Your answer (1-6): ").strip()
 
         if answer == correct_answer:
