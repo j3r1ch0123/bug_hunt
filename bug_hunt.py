@@ -18,7 +18,7 @@ def clear_screen():
         print("\n" * 100)  # A simple workaround for unsupported OS
 
 def ready():
-    banner = """\
+    banner = """
 __________                 ___ ___               __   
 \______   \__ __  ____    /   |   \ __ __  _____/  |_ 
  |    |  _/  |  \/ ___\  /    ~    \  |  \/    \   __|
