@@ -86,10 +86,16 @@ def login():
 """,
         "hardcoded_api_key": """api_key = "12345-ABCDE-67890"
 response = requests.get(f"https://api.example.com/data?key={api_key}")""",
+        "directory_transversal": """\
+file_path = "/var/www/html/" + input("Enter the file name: ")
+with open(file_path, 'r') as file:
+    data = file.read()
+""",
+
         
     }
 
-    options = ["SQL Injection", "XSS", "File Inclusion", "Command Injection", "Insecure Deserialization", "Open Redirect"]
+    options = ["SQL Injection", "XSS", "File Inclusion", "Command Injection", "Insecure Deserialization", "Hardcoded API Key", "Open Redirect", "Directory Transversal"]
     questions = {k.lower(): v for k, v in questions.items()}
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -100,8 +106,8 @@ response = requests.get(f"https://api.example.com/data?key={api_key}")""",
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization, 6. Open Redirect, 7. Hardcoded API Key")
-        answer = input("Your answer (1-7): ").strip()
+        print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization, 6. Open Redirect, 7. Hardcoded API Key 8. Directory Transversal")
+        answer = input("Your answer (1-8): ").strip()
         
         if answer == correct_answer:
             clear_screen()
@@ -158,10 +164,14 @@ app = Flask(__name__)
 def download():
     filename = request.args.get('file')
     return send_from_directory('/secure_directory', filename)
-"""
+""",
+        "insecure_jwt_implementation": """\
+import jwt
+token = jwt.encode({"user": "admin"}, "secret", algorithm="HS256")
+""",
     }
 
-    options = ["csrf", "file upload", "hardcoded credentials", "xxe", "weak cryptography", "ssrf"]
+    options = ["csrf", "file upload", "hardcoded credentials", "xxe", "weak cryptography", "ssrf", "insecure jwt implementation"]
     questions = {k.lower(): v for k, v in questions.items()}
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -172,8 +182,8 @@ def download():
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. csrf, 2. file upload, 3. hardcoded credentials, 4. xxe, 5. weak cryptography, 6. ssrf, 7. path transversal")
-        answer = input("Your answer (1-7): ").strip()
+        print("Options: 1. csrf, 2. file upload, 3. hardcoded credentials, 4. xxe, 5. weak cryptography, 6. ssrf, 7. path transversal, 8. insecure jwt implementation")
+        answer = input("Your answer (1-8): ").strip()
 
         if answer == correct_answer:
             clear_screen()
@@ -245,10 +255,20 @@ int main() {
     printf("%d\n", *ptr);
     return 0;
 }
-"""
+""",
+        "integer_overflow": """\
+int add(int a, int b) {
+    return a + b;
+}
+int main() {
+    int x = 2147483647;  // Maximum value for a 32-bit integer
+    int y = 1;
+    printf("%d\n", add(x, y));  // This overflows
+}
+""",
     }
 
-    options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection", "padding oracle attack", "user after free"]
+    options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection", "padding oracle attack", "user after free", "integer overflow"]
     questions = {k.lower(): v for k, v in questions.items()}
     option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
 
@@ -258,8 +278,8 @@ int main() {
         correct_key, question = random.choice(list(questions.items()))
         correct_answer = option_mapping[correct_key]
         print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection, 6. padding oracle attack, 7. use after free")
-        answer = input("Your answer (1-7): ").strip()
+        print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection, 6. padding oracle attack, 7. use after free, 8. integer overflow")
+        answer = input("Your answer (1-8): ").strip()
 
         if answer == correct_answer:
             clear_screen()
