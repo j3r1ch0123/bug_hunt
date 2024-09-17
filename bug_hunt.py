@@ -59,20 +59,69 @@ code. The harder the level, the more you earn.
         print("Invalid input. Please try again.")
         ready()
 
+def ask_questions(questions, options):
+    """Handles the asking of questions and returns the score."""
+    score = 0
+    total_questions = 5
+
+    for i in range(total_questions):
+        # Pick a random question that hasn't been used yet
+        correct_key, question_data = random.choice(list(questions.items()))
+        correct_answer = question_data["correct"]
+        question_text = question_data["question"]
+        
+        # Display question and options
+        print(f"\nSnippet {i + 1}:\n{question_text}")
+        print("Options: " + ', '.join([f"{idx}. {opt}" for idx, opt in enumerate(options, 1)]))
+        
+        # Get user answer
+        answer = input("Your answer (1-8): ").strip()
+
+        if answer == correct_answer:
+            clear_screen()
+            print("Correct!")
+            score += 1
+        else:
+            clear_screen()
+            print(f"Incorrect. The correct answer was: {correct_answer}")
+        
+        print(f"Score: {score}/{total_questions}")
+
+        # Remove the question that was just asked
+        del questions[correct_key]
+
+    return score
+
 def easy_difficulty():
     global crypto
 
     questions = {
-        "sql_injection": """user_input = input("Enter your username: ")
+        "sql_injection": {
+            "question": """user_input = input("Enter your username: ")
 query = f"SELECT * FROM users WHERE username = '{user_input}';""",
-        "xss": """<div>Welcome, <?php echo $_GET['username']; ?></div>""",
-        "file_inclusion": """$file = $_GET['file'];
+            "correct": "1"
+        },
+        "xss": {
+            "question": """<div>Welcome, <?php echo $_GET['username']; ?></div>""",
+            "correct": "2"
+        },
+        "file_inclusion": {
+            "question": """$file = $_GET['file'];
 include($file);""",
-        "command_injection": """$url = $_GET['url'];
+            "correct": "3"
+        },
+        "command_injection": {
+            "question": """$url = $_GET['url'];
 system($url);""",
-        "insecure_deserialization": """import pickle
+            "correct": "4"
+        },
+        "insecure_deserialization": {
+            "question": """import pickle
 data = pickle.loads(request.data)""",
-        "open_redirect": """from flask import Flask, request, redirect
+            "correct": "5"
+        },
+        "open_redirect": {
+            "question": """from flask import Flask, request, redirect
 
 app = Flask(__name__)
 
@@ -80,49 +129,36 @@ app = Flask(__name__)
 def login():
     next_url = request.args.get('next')
     # Login logic here...
-    return redirect(next_url)
-
-# Assume login logic goes here
-""",
-        "hardcoded_api_key": """api_key = "12345-ABCDE-67890"
+    return redirect(next_url)""",
+            "correct": "6"
+        },
+        "hardcoded_api_key": {
+            "question": """api_key = "12345-ABCDE-67890"
 response = requests.get(f"https://api.example.com/data?key={api_key}")""",
-        "directory_transversal": """\
+            "correct": "7"
+        },
+        "directory_transversal": {
+            "question": """\
 file_path = "/var/www/html/" + input("Enter the file name: ")
 with open(file_path, 'r') as file:
     data = file.read()
 """,
-
-        
+            "correct": "8"
+        },
     }
 
-    options = ["SQL Injection", "XSS", "File Inclusion", "Command Injection", "Insecure Deserialization", "Hardcoded API Key", "Open Redirect", "Directory Transversal"]
-    questions = {k.lower(): v for k, v in questions.items()}
-    option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
+    options = [
+        "SQL Injection", "XSS", "File Inclusion", "Command Injection", 
+        "Insecure Deserialization", "Open Redirect", "Hardcoded API Key", 
+        "Directory Transversal"
+    ]
 
     print("Easy difficulty selected...")
-    score = 0
-
-    for i in range(5):
-        correct_key, question = random.choice(list(questions.items()))
-        correct_answer = option_mapping[correct_key]
-        print(f"\nSnippet {i + 1}:\n{question}")
-        print("\nOptions: 1. SQL Injection, 2. XSS, 3. File Inclusion, 4. Command Injection, 5. Insecure Deserialization, 6. Open Redirect, 7. Hardcoded API Key 8. Directory Transversal")
-        answer = input("Your answer (1-8): ").strip()
-        
-        if answer == correct_answer:
-            clear_screen()
-            print("Correct!")
-            questions.pop(correct_key)
-            score += 1
-        else:
-            clear_screen()
-            print(f"Incorrect. The correct answer is: {correct_answer}")
-        print(f"Score: {score}/5")
+    score = ask_questions(questions, options)
 
     if score == 5:
         print("Congratulations! You have completed the easy difficulty level.")
         crypto += 10
-
     else:
         print("You have failed the easy difficulty level. Please try again.")
 
@@ -130,17 +166,34 @@ with open(file_path, 'r') as file:
 
 def medium_difficulty():
     global crypto
+
     questions = {
-        "csrf": """<form action="/transfer" method="POST">
-    <input type="hidden" name="amount" value="1000">
-    <input type="hidden" name="to_account" value="123456">
+        "csrf": {
+            "question": """<form action="/transfer" method="POST">
+<input type="hidden" name="amount" value="1000">
+<input type="hidden" name="to_account" value="123456">
 </form>""",
-        "file upload": '''move_uploaded_file($_FILES['file']['tmp_name'], "/uploads/" . $_FILES['file']['name']);''',
-        "hardcoded credentials": '''$username = "admin"; $password = "admin";''',
-        "xxe": """<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><tag>&xxe;</tag>""",
-        "weak cryptography": """from Crypto.Cipher import DES
+            "correct": "1"
+        },
+        "file_upload": {
+            "question": '''move_uploaded_file($_FILES['file']['tmp_name'], "/uploads/" . $_FILES['file']['name']);''',
+            "correct": "2"
+        },
+        "hardcoded_credentials": {
+            "question": '''$username = "admin"; $password = "admin";''',
+            "correct": "3"
+        },
+        "xxe": {
+            "question": """<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><tag>&xxe;</tag>""",
+            "correct": "4"
+        },
+        "weak_cryptography": {
+            "question": """from Crypto.Cipher import DES
 cipher = DES.new('8bytekey', DES.MODE_ECB)""",
-        "ssrf": """import requests
+            "correct": "5"
+        },
+        "ssrf": {
+            "question": """import requests
 from flask import Flask, request, send_file
 from io import BytesIO
 
@@ -151,55 +204,41 @@ def thumbnail():
     image_url = request.args.get('url')
     image_response = requests.get(image_url)
     
-    # Assume some image processing happens here
     img_io = BytesIO(image_response.content)
     img_io.seek(0)
-    return send_file(img_io, mimetype='image/jpeg')
-""",
-        "path_transversal": """from flask import Flask, send_from_directory, request
+    return send_file(img_io, mimetype='image/jpeg')""",
+            "correct": "6"
+        },
+        "path_transversal": {
+            "question": """from flask import Flask, send_from_directory, request
 
 app = Flask(__name__)
 
 @app.route('/download')
 def download():
     filename = request.args.get('file')
-    return send_from_directory('/secure_directory', filename)
-""",
-        "insecure_jwt_implementation": """\
-import jwt
-token = jwt.encode({"user": "admin"}, "secret", algorithm="HS256")
-""",
+    return send_from_directory('/secure_directory', filename)""",
+            "correct": "7"
+        },
+        "insecure_jwt_implementation": {
+            "question": """import jwt
+token = jwt.encode({"user": "admin"}, "secret", algorithm="HS256")""",
+            "correct": "8"
+        }
     }
 
-    options = ["csrf", "file upload", "hardcoded credentials", "xxe", "weak cryptography", "ssrf", "insecure jwt implementation"]
-    questions = {k.lower(): v for k, v in questions.items()}
-    option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
+    options = [
+        "CSRF", "File Upload", "Hardcoded Credentials", "XXE", "Weak Cryptography",
+        "SSRF", "Path Transversal", "Insecure JWT Implementation"
+    ]
 
     print("Medium difficulty selected...")
-    score = 0
-
-    for i in range(5):
-        correct_key, question = random.choice(list(questions.items()))
-        correct_answer = option_mapping[correct_key]
-        print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. csrf, 2. file upload, 3. hardcoded credentials, 4. xxe, 5. weak cryptography, 6. ssrf, 7. path transversal, 8. insecure jwt implementation")
-        answer = input("Your answer (1-8): ").strip()
-
-        if answer == correct_answer:
-            clear_screen()
-            print("Correct!")
-            questions.pop(correct_key)
-            score += 1
-        else:
-            clear_screen()
-            print(f"Incorrect. The correct answer is: {correct_answer}")
-        print(f"Score: {score}/5")
+    score = ask_questions(questions, options)
 
     if score == 5:
         clear_screen()
         print("Congratulations! You have completed the medium difficulty level.")
         crypto += 20
-
     else:
         clear_screen()
         print("You have failed the medium difficulty level. Please try again.")
@@ -208,95 +247,74 @@ token = jwt.encode({"user": "admin"}, "secret", algorithm="HS256")
 
 def hard_difficulty():
     global crypto
+
     questions = {
-        "buffer overflow": """void vulnerable_function(char *user_input) {
-    char buffer[10];
-    strcpy(buffer, user_input);
+        "buffer_overflow": {
+            "question": """void vulnerable_function(char *user_input) {
+char buffer[10];
+strcpy(buffer, user_input);
 }""",
-        "race condition": """def transfer(from_account, to_account, amount):
-    balance = get_balance(from_account)
-    if balance >= amount:
-        set_balance(from_account, balance - amount)
-        set_balance(to_account, get_balance(to_account) + amount)""",
-        "improper input validation": """int validate_user(int user_id) {
-    if (user_id > 0) {
-        return 1;
-    }
-    return 0;
+            "correct": "1"
+        },
+        "race_condition": {
+            "question": """def transfer(from_account, to_account, amount):
+balance = get_balance(from_account)
+if balance >= amount:
+    set_balance(from_account, balance - amount)
+    set_balance(to_account, get_balance(to_account) + amount)""",
+            "correct": "2"
+        },
+        "improper_input_validation": {
+            "question": """int validate_user(int user_id) {
+if (user_id > 0) {
+    return 1;
+}
+return 0;
 }""",
-        "clickjacking": """<iframe src="http://vulnerable-site.com" style="opacity:0;"></iframe>""",
-        "ldap injection": """query = f"(&(uid={user_input})(objectClass=person))""",
-        "padding_oracle_attack": """from flask import Flask, request
-from Crypto.Cipher import AES
-import base64
-
-app = Flask(__name__)
-
-key = b'Sixteen byte key'
-cipher = AES.new(key, AES.MODE_CBC, iv=b'RandomIV12345678')
-
-@app.route('/decrypt')
-def decrypt():
-    encrypted_data = base64.b64decode(request.args.get('data'))
-    try:
-        plaintext = cipher.decrypt(encrypted_data)
-        # Check for padding and handle errors here
-        return f'Decrypted data: {plaintext}'
-    except ValueError:
-        return 'Decryption failed due to padding error', 400
-""",
-        "use_after_free": """#include <stdio.h>
-#include <stdlib.h>
-
-int main() {
-    int *ptr = malloc(sizeof(int));
-    *ptr = 5;
-    free(ptr);
-    printf("%d\n", *ptr);
-    return 0;
-}
-""",
-        "integer_overflow": """\
-int add(int a, int b) {
-    return a + b;
-}
-int main() {
-    int x = 2147483647;
-    int y = 1;
-    printf("%d\n", add(x, y));
-}
-""",
+            "correct": "3"
+        },
+        "clickjacking": {
+            "question": """<iframe src="http://example.com/login" style="opacity:0;position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>""",
+            "correct": "4"
+        },
+        "side_channel_attack": {
+            "question": """def check_password(password):
+secret_password = "mysecretpassword"
+for i in range(len(password)):
+    if password[i] != secret_password[i]:
+        return False
+return True""",
+            "correct": "5"
+        },
+        "broken_authentication": {
+            "question": """if password == "password123":
+login(user)""",
+            "correct": "6"
+        },
+        "code_injection": {
+            "question": """exec(input("Enter your Python code: "))""",
+            "correct": "7"
+        },
+        "reflected_xss": {
+            "question": """search_query = request.args.get('q')
+return f"<h1>You searched for: {search_query}</h1>" """,
+            "correct": "8"
+        }
     }
 
-    options = ["buffer overflow", "race condition", "improper input validation", "clickjacking", "ldap injection", "padding oracle attack", "user after free", "integer overflow"]
-    questions = {k.lower(): v for k, v in questions.items()}
-    option_mapping = {k: str(i + 1) for i, k in enumerate(questions.keys())}
+    options = [
+        "Buffer Overflow", "Race Condition", "Improper Input Validation", 
+        "Clickjacking", "Side Channel Attack", "Broken Authentication", 
+        "Code Injection", "Reflected XSS"
+    ]
 
-    score = 0
-
-    for i in range(5):
-        correct_key, question = random.choice(list(questions.items()))
-        correct_answer = option_mapping[correct_key]
-        print(f"\nSnippet {i + 1}:\n{question}")
-        print("Options: 1. buffer overflow, 2. race condition, 3. improper input validation, 4. clickjacking, 5. ldap injection, 6. padding oracle attack, 7. use after free, 8. integer overflow")
-        answer = input("Your answer (1-8): ").strip()
-
-        if answer == correct_answer:
-            clear_screen()
-            print("Correct!")
-            questions.pop(correct_key)
-            score += 1
-        else:
-            clear_screen()
-            print(f"Incorrect. The correct answer is: {correct_answer}")
-        
-        print(f"Score: {score}/5")
+    print("Hard difficulty selected...")
+    score = ask_questions(questions, options)
 
     if score == 5:
         clear_screen()
         print("Congratulations! You have completed the hard difficulty level.")
-        crypto += 40
-
+        crypto += 30
     else:
         clear_screen()
         print("You have failed the hard difficulty level. Please try again.")
