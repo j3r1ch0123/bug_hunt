@@ -5,3 +5,6 @@ This is an educational game designed to teach beginners how to review code with 
 of finding vulnerabilities in mind. There shouldn't be any need to download new modules,
 
 it's a very basic program. Enjoy :)
+
+To do:
+Fix the bug that changes the button names after they're answered. Any advice is welcome
