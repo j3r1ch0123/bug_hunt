@@ -24,10 +24,12 @@ class RedirectText:
 class BugHunt:
     def __init__(self, root):
         self.root = root
-        self.root.title("Bug Hunt Game")
-        self.output_text = tk.Text(self.root)
-        self.output_text.pack()
-
+        self.questions_asked = 0
+        self.crypto = 0
+        self.current_question = None
+        self.current_options = []
+        self.correct_answer = None
+        self.difficulty = None  # Initially no difficulty set
         self.questions = {
             "easy": {
                 "sql_injection": """user_print = input("Enter your username: ")
@@ -146,15 +148,21 @@ class BugHunt:
             },
         }
 
-        self.current_question = None
-        self.current_options = []
-        self.correct_answer = None
-        self.crypto = 0
-        self.questions_asked = 0
+    def set_difficulty(self, difficulty):
+        """Set the difficulty for the game."""
+        if difficulty in self.questions:
+            self.difficulty = difficulty
+            print(f"Difficulty set to: {self.difficulty}")  # Debugging
+        else:
+            raise ValueError(f"Invalid difficulty: {difficulty}")
 
     def get_question(self):
+        """Return the next question based on the current difficulty."""
+        if not self.difficulty:
+            raise ValueError("Difficulty is not set or invalid.")
+
         if self.questions_asked < 5:
-            question_set = self.questions[self.difficulty]  # Ensure this accesses the correct set
+            question_set = self.questions[self.difficulty]
             self.correct_answer = random.choice(list(question_set.keys()))
             self.current_question = question_set[self.correct_answer]
 
@@ -167,8 +175,8 @@ class BugHunt:
             self.questions_asked += 1
 
             return self.current_question, [opt.replace("_", " ").title() for opt in self.current_options]
-        
-        return None, None  # Return None if no questions left
+
+        return None, None  # No more questions left
 
     def check_answer(self, selected_answer):
         if selected_answer == self.correct_answer.replace("_", " ").title():
@@ -194,175 +202,116 @@ class BugHunt:
         else:
             print("\n" * 100)
 
-    def ready(self):
-        self.clear_screen()
-        
-        # Instructions
-        self.output_text.insert(tk.END, "Welcome to Bug Hunt!\n")
-        
-        # Difficulty dropdown menu
-        self.difficulty_label = tk.Label(self.root, text="Choose Difficulty:")
-        self.difficulty_label.pack()
+    def reset(self):
+        """Reset the game state to allow a new game to start."""
+        self.questions_asked = 0
+        self.crypto = 0
+        self.current_question = None
+        self.current_options = []
+        self.correct_answer = None
+        print("Game has been reset.")  # Debug print
 
-        self.difficulty_var = tk.StringVar(value="easy")  # Set default value
-        self.difficulty_menu = tk.OptionMenu(self.root, self.difficulty_var, "easy", "medium", "hard")
-        self.difficulty_menu.pack(fill=tk.X)  # Make it fill the width
 
-        self.start_button = tk.Button(self.root, text="Start Game", command=self.start_game_button)
-        self.start_button.pack(pady=10)
-
-    def start_game_button(self):
-        difficulty = self.difficulty_var.get()
-        if difficulty:
-            if self.bug_hunt.start_game(difficulty):  # Corrected method call
-                self.output_text.delete(1.0, tk.END)  # Clear existing text
-                self.play_game()  # Start the first question display
-            else:
-                print("Invalid difficulty selected.")
-
-    def start_game(self, difficulty):
-        if difficulty in self.questions:
-            self.difficulty = difficulty  # Set the difficulty
-            self.questions_asked = 0
-            return True
-        return False
-
-    def play_game(self):
-        self.output_text.delete(1.0, tk.END)  # Clear the output text area
-        question, options = self.get_question()
-
-        if question:
-            self.output_text.insert(tk.END, "Vulnerability code:\n")
-            self.output_text.insert(tk.END, question + "\n")
-            self.output_text.insert(tk.END, "\nChoose the vulnerability type:")
-
-            for i, option in enumerate(options, 1):
-                self.output_text.insert(tk.END, f"{i}. {option}\n")
-
-            self.answer_button = tk.Button(self.root, text="Submit Answer", command=lambda: self.check_answer_button(options))
-            self.answer_button.pack()
-        else:
-            self.output_text.insert(tk.END, "Game Over! Final Score: {self.crypto} BTC")
-            self.answer_button["state"] = "disabled"
-            
-    def check_answer_button(self, options):
-        selected_answer = options[0]  # Let's assume the first option is selected for now
-        correct = self.check_answer(selected_answer)
-
-        if correct and not self.is_game_complete():
-            self.play_game()
-
-        else:
-            self.end_game()
-
-    def end_game(self):
-        self.output_text.insert(tk.END, "\nGame over! Your final score: " + str(self.crypto) + " BTC\n")
-        self.answer_button["state"] = "disabled"
-
-    def exit_game(self):
-        self.root.quit()
-        
 class Game:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Bug Hunt Game")
-        self.root.geometry("{0}x{1}+0+0".format(self.root.winfo_screenwidth(), self.root.winfo_screenheight()))
-        self.root.minsize(800, 600)
-        self.root.configure(bg="#000000")
+        self.difficulty_var = tk.StringVar(value="easy")  # Default to easy difficulty
+        difficulty_menu = tk.OptionMenu(self.root, self.difficulty_var, "easy", "medium", "hard")
+        difficulty_menu.pack()
 
         self.bug_hunt = BugHunt(self.root)
 
-        self.main_frame = tk.Frame(self.root, bg="#000000")
-        self.main_frame.pack(fill=tk.BOTH, expand=True)
+        # Create frames for better layout
+        self.top_frame = tk.Frame(self.root, bg="gray", height=400)
+        self.top_frame.pack(fill=tk.BOTH, expand=True)
+        self.bottom_frame = tk.Frame(self.root, height=100, bg="darkgray")
+        self.bottom_frame.pack(fill=tk.X, side=tk.BOTTOM)
 
-        self.output_text = tk.Text(self.main_frame, bg="#000000", fg="#ffffff")
-        self.output_text.pack(fill=tk.BOTH, expand=True)
+        # Output text box in the top frame
+        self.output_text = tk.Text(self.top_frame, bg="black", fg="green")
+        self.output_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Initialize score
-        self.score = self.bug_hunt.crypto
-        self.score_label = tk.Label(self.main_frame, text=f"Score: {self.score}", bg="#000000", fg="#ffffff", font=("Arial", 14))
-        self.score_label.pack(pady=10)
+        # Start button in the bottom frame
+        self.start_button = tk.Button(self.bottom_frame, text="Start Game", command=self.ready_game)
+        self.start_button.pack(side=tk.BOTTOM, pady=10)
 
-        # Difficulty selection frame
-        self.difficulty_frame = tk.Frame(self.main_frame, bg="#000000")
-        self.difficulty_frame.pack(pady=20, fill=tk.X)
-
-        self.difficulty_label = tk.Label(self.difficulty_frame, text="Choose Difficulty:", bg="#000000", fg="#ffffff")
-        self.difficulty_label.pack(side=tk.LEFT)
-
-        self.difficulty_var = tk.StringVar(value="easy")
-        self.difficulty_menu = tk.OptionMenu(self.difficulty_frame, self.difficulty_var, "easy", "medium", "hard")
-        self.difficulty_menu.pack(side=tk.LEFT, fill=tk.X, expand=True)
-
-        self.start_button = tk.Button(self.difficulty_frame, text="Start Game", command=self.start_game, bg="black", fg="white")
-        self.start_button.pack(side=tk.LEFT, padx=5)
-
-        self.bug_hunt.ready()
-
-        # Answer buttons frame
-        self.answer_frame = tk.Frame(self.main_frame, bg="#000000")
-        self.answer_frame.pack(pady=20, fill=tk.X)
-
-        self.answer_buttons = []
-        for i in range(8):
-            button = tk.Button(self.answer_frame, text=f"Answer {i + 1}", command=lambda i=i: self.check_answer(i), bg="black", fg="white")
-            button.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
-            self.answer_buttons.append(button)
-
-        # Exit button
-        self.exit_button = tk.Button(self.main_frame, text="Exit", command=self.bug_hunt.exit_game, bg="black", fg="white")
-        self.exit_button.pack(pady=10)
-
-        # Update the score label initially
-        self.update_score_label()
-
-        # Redirect stdout to the text widget
         sys.stdout = RedirectText(self.output_text)
-
         self.root.mainloop()
 
-    def update_score_label(self):
-        # Update the score label text
-        self.score_label.config(text=f"Score: {self.bug_hunt.crypto}")
+    def ready_game(self):
+        self.output_text.delete(1.0, tk.END)
+        self.output_text.insert(tk.END, "Welcome to Bug Hunt!\n")
+
+        # Difficulty selection menu
+        difficulty_menu = tk.OptionMenu(self.bottom_frame, self.difficulty_var, "easy", "medium", "hard")
+        difficulty_menu.pack(side=tk.TOP, pady=10)
+
+        self.confirm_button = tk.Button(self.bottom_frame, text="Confirm Difficulty", command=self.start_game)
+        self.confirm_button.pack(side=tk.TOP)
+
+        self.bug_hunt.reset()
 
     def start_game(self):
-        difficulty = self.difficulty_var.get()
-        if difficulty:
-            if self.bug_hunt.start_game(difficulty):
-                self.output_text.delete(1.0, tk.END)
-                self.display_question()
-            else:
-                print("Invalid difficulty selected.")
+        difficulty = self.difficulty_var.get()  # Get difficulty value from difficulty_var
+        print(f"Selected difficulty: {difficulty}")  # Debugging
+        
+        self.bug_hunt.set_difficulty(difficulty)  # Set difficulty in BugHunt
+        
+        self.output_text.delete(1.0, tk.END)  # Clear the text
+        self.play_game()
 
-    def display_question(self):
+    def play_game(self):
         question, options = self.bug_hunt.get_question()
         if question:
-            self.output_text.delete(1.0, tk.END)
-            self.output_text.insert(tk.END, question + "\n\n")
+            self.output_text.insert(tk.END, f"\nVulnerability Code:\n{question}\n")
+            self.output_text.insert(tk.END, "\nChoose the vulnerability type:\n")
+            
+            # Destroy previous answer buttons if they exist
+            if hasattr(self, 'answer_buttons'):
+                for btn in self.answer_buttons:
+                    btn.destroy()
 
-            for i, option in enumerate(options):
-                self.answer_buttons[i].config(text=option, bg="black", state=tk.NORMAL)
+            # Create new answer buttons
+            self.answer_buttons = [
+                tk.Button(self.bottom_frame, text=opt, command=lambda o=opt: self.check_answer(o), bg="black", fg="white")
+                for opt in options
+            ]
 
-            for i in range(len(options), len(self.answer_buttons)):
-                self.answer_buttons[i].config(state=tk.DISABLED)
+            for btn in self.answer_buttons:
+                btn.pack(side=tk.LEFT, padx=5, pady=10)
         else:
-            self.output_text.insert(tk.END, "Game Over!\n")
-            for button in self.answer_buttons:
-                button.config(state=tk.DISABLED)
+            self.output_text.insert(tk.END, f"\nGame Over! Final Score: {self.bug_hunt.crypto} BTC\n")
+            self.show_play_again_button()
 
-    def check_answer(self, answer_index):
-        selected_answer = self.answer_buttons[answer_index].cget("text")
-        correct = self.bug_hunt.check_answer(selected_answer)
-
-        # Update the score label right after checking the answer
-        self.update_score_label()
-
-        if not self.bug_hunt.is_game_complete():
-            self.display_question()
+    def check_answer(self, selected_answer):
+        if self.bug_hunt.check_answer(selected_answer):
+            self.output_text.insert(tk.END, "Correct!\n")
         else:
-            self.output_text.insert(tk.END, f"Game Over! Final Score: {self.bug_hunt.crypto}\n")
-            for button in self.answer_buttons:
-                button.config(state=tk.DISABLED)
+            self.output_text.insert(tk.END, f"Incorrect! The correct answer was: {self.bug_hunt.correct_answer}\n")
+        
+        # Destroy current answer buttons
+        for btn in self.answer_buttons:
+            btn.destroy()
+        
+        if self.bug_hunt.is_game_complete():
+            self.output_text.insert(tk.END, f"\nGame Over! Final Score: {self.bug_hunt.crypto} BTC\n")
+            self.show_play_again_button()
+        else:
+            self.play_game()
+
+    def show_play_again_button(self):
+        """Show a play again button when the game ends."""
+        if not hasattr(self, 'play_again_button') or self.play_again_button is None:  # Only create the button once
+            self.play_again_button = tk.Button(self.root, text="Play Again", command=self.play_again)
+            self.play_again_button.pack(pady=10)
+
+    def play_again(self):
+        """Reset the game state and start a new game."""
+        self.bug_hunt.reset()  # Reset the game state in BugHunt
+        self.output_text.delete(1.0, tk.END)  # Clear the text box
+        self.play_again_button.pack_forget()  # Remove the "Play Again" button
+        self.start_game()  # Start a new game
 
 if __name__ == "__main__":
     game = Game()
