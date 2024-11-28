@@ -239,6 +239,19 @@ class Game:
         sys.stdout = RedirectText(self.output_text)
         self.root.mainloop()
 
+    def clear_screen(self):
+        # Clear the output text box
+        self.output_text.delete(1.0, tk.END)
+
+        # Destroy any dynamically created buttons or widgets
+        if hasattr(self, 'answer_buttons'):
+            for btn in self.answer_buttons:
+                btn.destroy()
+
+        # Optionally clear other frames or widgets (if needed)
+        if hasattr(self, 'play_again_button') and self.play_again_button.winfo_exists():
+            self.play_again_button.destroy()
+
     def ready_game(self):
         self.output_text.delete(1.0, tk.END)
         self.output_text.insert(tk.END, "Welcome to Bug Hunt!\n")
@@ -285,6 +298,7 @@ class Game:
             self.show_play_again_button()
 
     def check_answer(self, selected_answer):
+        self.clear_screen()
         if self.bug_hunt.check_answer(selected_answer):
             self.output_text.insert(tk.END, "Correct!\n")
         else:
